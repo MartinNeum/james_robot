@@ -17,7 +17,7 @@ logging.basicConfig(
 )
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await context.bot.send_message(chat_id=update.effective_chat.id, text="Hi there, I am James! 👋 How can I help you?", parse_mode='Markdown')
+    await context.bot.send_message(chat_id=update.effective_chat.id, text="Hi there, I am James! 👋 How can I help you? \n_Use /help to see all avaliable commands_", parse_mode='Markdown')
 
 async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await context.bot.send_message(
@@ -30,7 +30,7 @@ async def remind(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         args = context.args
         if len(args) < 2:
-            await context.bot.send_message(chat_id=update.effective_chat.id, text="Usage: /remind <time> <text>")
+            await context.bot.send_message(chat_id=update.effective_chat.id, text="⚙️ Please use this format: /remind <time> <text>")
             return
 
         time_str = args[0]
@@ -41,13 +41,13 @@ async def remind(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         unit = time_str[-1]
         if unit not in time_units:
-            await context.bot.send_message(chat_id=update.effective_chat.id, text="Invalid time unit. Use m, h, d, or w.")
+            await context.bot.send_message(chat_id=update.effective_chat.id, text="❗️ Invalid time unit. Please use m, h, d, or w.")
             return
 
         try:
             duration = int(time_str[:-1]) * time_units[unit]
         except ValueError:
-            await context.bot.send_message(chat_id=update.effective_chat.id, text="Invalid time value.")
+            await context.bot.send_message(chat_id=update.effective_chat.id, text="❗️ Invalid time value. Please try again.")
             return
         
         # Reminder erstellen und speichern
@@ -78,17 +78,18 @@ async def remind(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     except Exception as e:
         logging.error(str(e))
+        await context.bot.send_message(chat_id=update.effective_chat.id, text=f"⚠️ Sorry! There is an internal error. Please contact the admin.")
 
 async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         args = context.args
         if len(args) != 1:
-            await context.bot.send_message(chat_id=update.effective_chat.id, text="Usage: /cancel <reminder_id>")
+            await context.bot.send_message(chat_id=update.effective_chat.id, text="⚙️ Please use this format: /cancel <reminder_id>")
             return
 
         chat_id_to_remove = int(args[0])
 
-        # Durchsuchen der geplanten Erinnerungen und Entfernen derjenigen mit der angegebenen chat_id
+        # Durchsuchen der geplanten Erinnerungen und Entfernen derjenigen mit der angegebenen chat_id und reminder_id
         removed = False
         try:
             with open(REMINDERS_LIST, 'r') as file:
@@ -103,12 +104,14 @@ async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 json.dump(reminders, file, indent=2)
         
         except Exception as e:
-            print(f"Fehler beim Überprüfen der Erinnerungen: {str(e)}")
+            logging.error(str(e))
+            await context.bot.send_message(chat_id=update.effective_chat.id, text=f"⚠️ Sorry! There is an internal error. Please contact the admin.")
+
 
         if removed:
             await context.bot.send_message(chat_id=update.effective_chat.id, text="Success! ✅ Reminder removed.")
         else:
-            await context.bot.send_message(chat_id=update.effective_chat.id, text="No reminders found for the specified chat_id.")
+            await context.bot.send_message(chat_id=update.effective_chat.id, text="Uuups! 🤔 No reminders found for the specified ID.")
     except Exception as e:
         logging.error(str(e))
 
@@ -126,16 +129,18 @@ async def list_reminders(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 # Wandele den Timestamp in ein datetime-Objekt um und formatiere
                 dt_object = datetime.fromtimestamp(reminder['reminder_time'])
                 formatted_date_time = dt_object.strftime("%d.%m.%y at %H:%M")
-                reminders_text += f"'{reminder['text']}' , set for {formatted_date_time}\n"
+                reminders_text += f"📌 '{reminder['text']}' ({formatted_date_time})\n"
                 reminder_found = True
 
     except Exception as e:
-        print(f"Fehler beim Überprüfen der Erinnerungen: {str(e)}")
+        logging.error(str(e))
+        await context.bot.send_message(chat_id=update.effective_chat.id, text=f"⚠️ Sorry! There is an internal error. Please contact the admin.")
+
 
     if reminder_found:
         await context.bot.send_message(chat_id=update.effective_chat.id, text=reminders_text, parse_mode='Markdown')
     else:
-        await context.bot.send_message(chat_id=update.effective_chat.id, text="Currently no reminders set.")
+        await context.bot.send_message(chat_id=update.effective_chat.id, text="👏 It seems you're done for now. Enjoy your free time!")
 
 
 async def check_reminders():
@@ -157,7 +162,7 @@ async def check_reminders():
                 json.dump(reminders, file, indent=2)
         
         except Exception as e:
-            print(f"Fehler beim Überprüfen der Erinnerungen: {str(e)}")
+            logging.error(str(e))
 
         await asyncio.sleep(30)
 
