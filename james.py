@@ -22,7 +22,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await context.bot.send_message(
         chat_id=update.effective_chat.id, 
-        text="ℹ️ *Help* \n\nYou can use these commands to interact with me: \n\n /help - Show avaliable commands",
+        text="ℹ️ *Help* \n\nYou can use these commands to interact with me: \n\n /help - Show avaliable commands\n /list - Show current reminders\n /remind - Create reminder\n /cancel - Cancel an existing reminder",
         parse_mode='Markdown'
     )
 
@@ -73,7 +73,7 @@ async def remind(update: Update, context: ContextTypes.DEFAULT_TYPE):
         with open('reminders.json', 'w') as file:
             json.dump(reminders, file, indent=2)
 
-        await context.bot.send_message(chat_id=update.effective_chat.id, text="Success! Reminder set with ID:")
+        await context.bot.send_message(chat_id=update.effective_chat.id, text="Success! ✅ Reminder set with ID:")
         await context.bot.send_message(chat_id=update.effective_chat.id, text=f"{reminder_id}")
 
     except Exception as e:
@@ -106,14 +106,14 @@ async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
             print(f"Fehler beim Überprüfen der Erinnerungen: {str(e)}")
 
         if removed:
-            await context.bot.send_message(chat_id=update.effective_chat.id, text="Success! Reminder removed.")
+            await context.bot.send_message(chat_id=update.effective_chat.id, text="Success! ✅ Reminder removed.")
         else:
             await context.bot.send_message(chat_id=update.effective_chat.id, text="No reminders found for the specified chat_id.")
     except Exception as e:
         logging.error(str(e))
 
 async def list_reminders(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    reminders_text = "Current reminders:\n\n"
+    reminders_text = "📃 *List of current Reminders*\n\n"
     
     try:
         with open(REMINDERS_LIST, 'r') as file:
@@ -125,7 +125,7 @@ async def list_reminders(update: Update, context: ContextTypes.DEFAULT_TYPE):
             if reminder["chat_id"] == update.effective_chat.id:
                 # Wandele den Timestamp in ein datetime-Objekt um und formatiere
                 dt_object = datetime.fromtimestamp(reminder['reminder_time'])
-                formatted_date_time = dt_object.strftime("%d.%m.%y um %H:%M Uhr")
+                formatted_date_time = dt_object.strftime("%d.%m.%y at %H:%M")
                 reminders_text += f"'{reminder['text']}' , set for {formatted_date_time}\n"
                 reminder_found = True
 
@@ -133,7 +133,7 @@ async def list_reminders(update: Update, context: ContextTypes.DEFAULT_TYPE):
         print(f"Fehler beim Überprüfen der Erinnerungen: {str(e)}")
 
     if reminder_found:
-        await context.bot.send_message(chat_id=update.effective_chat.id, text=reminders_text)
+        await context.bot.send_message(chat_id=update.effective_chat.id, text=reminders_text, parse_mode='Markdown')
     else:
         await context.bot.send_message(chat_id=update.effective_chat.id, text="Currently no reminders set.")
 
@@ -149,7 +149,7 @@ async def check_reminders():
             for reminder in reminders:
                 if reminder["reminder_time"] <= current_time:
                     # Sende die Erinnerungsnachricht hier
-                    await bot.send_message(chat_id=reminder["chat_id"], text=f"Reminder: {reminder['text']}")
+                    await bot.send_message(chat_id=reminder["chat_id"], text=f"🔔 *Reminder:* {reminder['text']}", parse_mode='Markdown')
                     # Entferne die Erinnerung aus der JSON-Datei
                     reminders.remove(reminder)
             
