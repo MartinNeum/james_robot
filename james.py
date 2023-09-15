@@ -22,9 +22,12 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await context.bot.send_message(chat_id=update.effective_chat.id, text="Hi there, I am James! 👋 How can I help you? \n_Use /help to see all avaliable commands_", parse_mode='Markdown')
 
 async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    header_text = "🤝 *Help*\n\nYou can use these commands to interact with me:"
+    commands_text = "/help - Show avaliable commands\n /weather - Get the weather of a specified city\n /list - Show current reminders\n /remind - Create reminder\n /cancel - Cancel an existing reminder"
+    
     await context.bot.send_message(
         chat_id=update.effective_chat.id, 
-        text="🤝 *Help* \n\nYou can use these commands to interact with me: \n\n /help - Show avaliable commands\n /list - Show current reminders\n /remind - Create reminder\n /cancel - Cancel an existing reminder",
+        text=f"{header_text} \n\n {commands_text}",
         parse_mode='Markdown'
     )
 
