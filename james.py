@@ -117,6 +117,7 @@ async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def list_reminders(update: Update, context: ContextTypes.DEFAULT_TYPE):
     reminders_text = "📃 *List of current Reminders*\n\n"
+    hint_text = "\n_Timezone is UTC_ "
     
     try:
         with open(REMINDERS_LIST, 'r') as file:
@@ -138,7 +139,7 @@ async def list_reminders(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
     if reminder_found:
-        await context.bot.send_message(chat_id=update.effective_chat.id, text=reminders_text, parse_mode='Markdown')
+        await context.bot.send_message(chat_id=update.effective_chat.id, text=reminders_text + hint_text, parse_mode='Markdown')
     else:
         await context.bot.send_message(chat_id=update.effective_chat.id, text="👏 It seems you're done for now. Enjoy your free time!")
 
