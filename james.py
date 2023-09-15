@@ -22,15 +22,20 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await context.bot.send_message(
         chat_id=update.effective_chat.id, 
-        text="ℹ️ *Help* \n\nYou can use these commands to interact with me: \n\n /help - Show avaliable commands\n /list - Show current reminders\n /remind - Create reminder\n /cancel - Cancel an existing reminder",
+        text="🤝 *Help* \n\nYou can use these commands to interact with me: \n\n /help - Show avaliable commands\n /list - Show current reminders\n /remind - Create reminder\n /cancel - Cancel an existing reminder",
         parse_mode='Markdown'
     )
 
 async def remind(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    header_text = "⚙️ *How to: /remind*"
+    syntax_text = "Please use this format: /remind `time` `text`"
+    format_text = "• For `time` use m (minutes), h (hours), d (days) or w (weeks) \n • For `text` type any text you want James to tell you"
+    example_text = "`/remind 2h Buy some Bananas 🍌` \n\nIn this example, James will send you a message in 2 hours with the text _'Buy some Bananas 🍌'_ "
+    
     try:
         args = context.args
         if len(args) < 2:
-            await context.bot.send_message(chat_id=update.effective_chat.id, text="⚙️ Please use this format: /remind _time_ _text_", parse_mode='Markdown')
+            await context.bot.send_message(chat_id=update.effective_chat.id, text=f"{header_text}\n\n {syntax_text}\n\n *Parameters*\n {format_text}\n\n *Example*\n {example_text}", parse_mode='Markdown')
             return
 
         time_str = args[0]
@@ -81,10 +86,15 @@ async def remind(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await context.bot.send_message(chat_id=update.effective_chat.id, text=f"😬 Sorry! There is an internal error. Please try again or contact the admin.")
 
 async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    header_text = "⚙️ *How to: /cancel*"
+    syntax_text = "Please use this format: /cancel `reminder_id`"
+    format_text = "• For `reminder_id` please paste the ID of the reminder you want to delete \n • _Hint: The ID was provided when you created the reminder_"
+    example_text = "`/cancel 123` \n\nIn this example, James will remove the reminder with the ID '123'."
+    
     try:
         args = context.args
         if len(args) != 1:
-            await context.bot.send_message(chat_id=update.effective_chat.id, text="⚙️ Please use this format: /cancel <reminder_id>")
+            await context.bot.send_message(chat_id=update.effective_chat.id, text=f"{header_text}\n\n {syntax_text}\n\n *Parameters*\n {format_text}\n\n *Example*\n {example_text}", parse_mode='Markdown')
             return
 
         chat_id_to_remove = int(args[0])
