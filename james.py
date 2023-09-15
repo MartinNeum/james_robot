@@ -30,7 +30,7 @@ async def remind(update: Update, context: ContextTypes.DEFAULT_TYPE):
     header_text = "⚙️ *How to: /remind*"
     syntax_text = "Please use this format: /remind `time` `text`"
     format_text = "• For `time` use m (minutes), h (hours), d (days) or w (weeks) \n • For `text` type any text you want James to tell you"
-    example_text = "`/remind 2h Buy some Bananas 🍌` \n\nIn this example, James will send you a message in 2 hours with the text _'Buy some Bananas 🍌'_ "
+    example_text = "`/remind 2h Buy some Bananas 🍌` \n\nIn this example, James will send you a message in 2 hours with the text _'Buy some Bananas 🍌'._ "
     
     try:
         args = context.args
@@ -88,7 +88,7 @@ async def remind(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
     header_text = "⚙️ *How to: /cancel*"
     syntax_text = "Please use this format: /cancel `reminder_id`"
-    format_text = "• For `reminder_id` please paste the ID of the reminder you want to delete \n • _Hint: The ID was provided when you created the reminder_"
+    format_text = "• For `reminder_id` paste the ID of the reminder you want to delete \n • _Hint: The ID was provided when you created the reminder_"
     example_text = "`/cancel 123` \n\nIn this example, James will remove the reminder with the ID '123'."
     
     try:
