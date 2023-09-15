@@ -30,7 +30,7 @@ async def remind(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         args = context.args
         if len(args) < 2:
-            await context.bot.send_message(chat_id=update.effective_chat.id, text="⚙️ Please use this format: /remind <time> <text>")
+            await context.bot.send_message(chat_id=update.effective_chat.id, text="⚙️ Please use this format: /remind _time_ _text_", parse_mode='Markdown')
             return
 
         time_str = args[0]
