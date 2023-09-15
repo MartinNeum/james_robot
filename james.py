@@ -78,7 +78,7 @@ async def remind(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     except Exception as e:
         logging.error(str(e))
-        await context.bot.send_message(chat_id=update.effective_chat.id, text=f"⚠️ Sorry! There is an internal error. Please contact the admin.")
+        await context.bot.send_message(chat_id=update.effective_chat.id, text=f"😬 Sorry! There is an internal error. Please try again or contact the admin.")
 
 async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
@@ -105,7 +105,7 @@ async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
         
         except Exception as e:
             logging.error(str(e))
-            await context.bot.send_message(chat_id=update.effective_chat.id, text=f"⚠️ Sorry! There is an internal error. Please contact the admin.")
+            await context.bot.send_message(chat_id=update.effective_chat.id, text=f"😬 Sorry! There is an internal error. Please try again or contact the admin.")
 
 
         if removed:
@@ -135,7 +135,7 @@ async def list_reminders(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     except Exception as e:
         logging.error(str(e))
-        await context.bot.send_message(chat_id=update.effective_chat.id, text=f"⚠️ Sorry! There is an internal error. Please contact the admin.")
+        await context.bot.send_message(chat_id=update.effective_chat.id, text=f"😬 Sorry! There is an internal error. Please try again or contact the admin.")
 
 
     if reminder_found:
