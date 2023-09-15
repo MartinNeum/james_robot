@@ -2,12 +2,14 @@ import logging
 import asyncio
 import threading
 import time, json
+import weather
+import functools
 from telegram import Update
 from telegram.ext import ApplicationBuilder, ContextTypes, CommandHandler
 from decouple import config
 from datetime import datetime
 
-TOKEN = config('TELEGRAM_TOKEN')
+TELEGRAM_TOKEN = config('TELEGRAM_TOKEN')
 REMINDERS_LIST = 'reminders.json'
 
 logging.basicConfig(
@@ -46,13 +48,13 @@ async def remind(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         unit = time_str[-1]
         if unit not in time_units:
-            await context.bot.send_message(chat_id=update.effective_chat.id, text="❗️ Invalid time unit. Please use m, h, d, or w.")
+            await context.bot.send_message(chat_id=update.effective_chat.id, text="💬 Invalid time unit. Please use m, h, d, or w.")
             return
 
         try:
             duration = int(time_str[:-1]) * time_units[unit]
         except ValueError:
-            await context.bot.send_message(chat_id=update.effective_chat.id, text="❗️ Invalid time value. Please try again.")
+            await context.bot.send_message(chat_id=update.effective_chat.id, text="💬 Invalid time value. Please try again.")
             return
         
         # Reminder erstellen und speichern
@@ -176,9 +178,9 @@ async def check_reminders():
             logging.error(str(e))
 
         await asyncio.sleep(30)
-
+  
 if __name__ == '__main__':
-    application = ApplicationBuilder().token(TOKEN).build()
+    application = ApplicationBuilder().token(TELEGRAM_TOKEN).build()
     bot = application.bot
     
     start_handler = CommandHandler('start', start)
@@ -186,12 +188,14 @@ if __name__ == '__main__':
     reminder_handler = CommandHandler('remind', remind)
     cancel_handler = CommandHandler('cancel', cancel)
     list_handler = CommandHandler('list', list_reminders)
-    
+    weather_handler = CommandHandler('weather', functools.partial(weather.get_weather, bot=bot))
+
     application.add_handler(start_handler)
     application.add_handler(help_handler)
     application.add_handler(reminder_handler)
     application.add_handler(cancel_handler)
     application.add_handler(list_handler)
+    application.add_handler(weather_handler)
     
     # Starten Sie den Thread zur Überprüfung der Erinnerungen
     threading.Thread(target=lambda: asyncio.run(check_reminders()), daemon=True).start()
