@@ -2,7 +2,7 @@ import logging
 import asyncio
 import threading
 import time, json
-import weather
+import services.weather as weather
 import functools
 from telegram import Update
 from telegram.ext import ApplicationBuilder, ContextTypes, CommandHandler
