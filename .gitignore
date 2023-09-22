@@ -1,2 +1,3 @@
 .env
 reminders.json
+__pycache__/
