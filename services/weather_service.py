@@ -77,7 +77,6 @@ async def get_weather_from_api(city):
         response_text += f"_{location_name}, {location_region}_\n\n"
         response_text += f"*Today*\n"
         response_text += f"☀️ {today_weather_description} • 🌡 {today_temperature}°C • ☔️ {today_chanceof_rain}% • 💨 {today_wind} km/h\n\n"
-        # response_text += f"☀️ {today_weather_description}\n 🌡 {today_temperature}°C\n ☔️ {today_chanceof_rain}%\n 💨 {today_wind} km/h\n\n"
         response_text += f"📆 *Forecast*\n"
 
         i = 0
@@ -97,7 +96,6 @@ async def get_weather_from_api(city):
                 forecast_wind = data['forecast']['forecastday'][i]['day']['maxwind_kph']
 
                 response_text += f"{forecast_weather_description} • {forecast_temperature}°C • {forecast_chanceof_rain}% • {forecast_wind} km/h\n"
-                # response_text += f"☀️ {forecast_weather_description}\n 🌡 {forecast_temperature}°C\n ☔️ {forecast_chanceof_rain}%\n 💨 {forecast_wind} km/h\n\n"
                 i += 1
 
     else:

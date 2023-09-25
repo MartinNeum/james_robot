@@ -205,7 +205,7 @@ async def get_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
             for setting in settings:
                 if setting["chat_id"] == update.effective_chat.id:
                     get_greeting = "Yes" if setting['get_daily_greeting'] else "No"
-                    settings_text += f"• 🙍‍♂️ Username: _{setting['username']}_\n • 📍 Loaction: _{setting['location']}_\n • 📰 Get daily greeting: _{get_greeting}_"
+                    settings_text += f"🙍‍♂️ Username: _{setting['username']}_\n 📍 Location: _{setting['location']}_\n 📰 Daily Update: _{get_greeting}_"
 
                 await context.bot.send_message(chat_id=update.effective_chat.id, text=f"{header_text}\n\n {settings_text}", parse_mode='Markdown')
                 return
