@@ -35,7 +35,7 @@ async def check_reminders():
             
             for reminder in reminders:
                 if reminder["reminder_time"] <= current_time:
-                    await bot.send_message(chat_id=reminder["chat_id"], text=f"🔔 *Reminder:* {reminder['text']}", parse_mode='Markdown')
+                    await bot.send_message(chat_id=reminder["chat_id"], text=f"🔔 *Reminder:* {reminder['reminder_text']}", parse_mode='Markdown')
                     reminders.remove(reminder)
             
             with open(reminder_service.REMINDERS_LIST, 'w') as file:

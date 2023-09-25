@@ -37,10 +37,10 @@ async def remind(update: Update, context: ContextTypes.DEFAULT_TYPE):
         # Reminder erstellen und speichern
         reminder_id = int(time.time())
         new_reminder = {
-            "id": reminder_id,
+            "reminder_id": reminder_id,
             "chat_id": update.effective_chat.id,
             "reminder_time": int(time.time()) + duration,
-            "text": text
+            "reminder_text": text
         }
     
         # Lade vorhandene Erinnerungen aus der JSON-Datei (falls vorhanden)
@@ -85,7 +85,7 @@ async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 reminders = json.load(file)
             
             for reminder in reminders:
-                if reminder["chat_id"] == update.effective_chat.id and chat_id_to_remove == reminder["id"]:
+                if reminder["chat_id"] == update.effective_chat.id and chat_id_to_remove == reminder["reminder_id"]:
                     reminders.remove(reminder)
                     removed = True
 
@@ -118,7 +118,7 @@ async def list_reminders(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 # Wandele den Timestamp in ein datetime-Objekt um und formatiere
                 dt_object = datetime.fromtimestamp(reminder['reminder_time'])
                 formatted_date_time = dt_object.strftime("%d.%m.%y at %H:%M")
-                reminders_text += f"📌 '{reminder['text']}' ({formatted_date_time})\n"
+                reminders_text += f"📌 '{reminder['reminder_text']}' ({formatted_date_time})\n"
                 reminder_found = True
 
     except Exception as e:
