@@ -1,5 +1,5 @@
 import logging, asyncio, threading, time, json, functools
-from services import reminder_service, weather_service
+from services import reminder_service, weather_service, setting_service
 from telegram import Update
 from telegram.ext import ApplicationBuilder, ContextTypes, CommandHandler
 from decouple import config
@@ -57,12 +57,22 @@ if __name__ == '__main__':
     list_handler = CommandHandler('list', reminder_service.list_reminders)
     weather_handler = CommandHandler('weather', functools.partial(weather_service.get_weather, bot=bot))
 
+    set_username_handler = CommandHandler('setusername', setting_service.set_username)
+    set_location_handler = CommandHandler('setlocation', setting_service.set_location)
+    set_daily_greeting_handler = CommandHandler('setdailygreeting', setting_service.set_daily_greeting)
+    settings_handler = CommandHandler('settings', setting_service.get_settings)
+
     application.add_handler(start_handler)
     application.add_handler(help_handler)
     application.add_handler(reminder_handler)
     application.add_handler(cancel_handler)
     application.add_handler(list_handler)
     application.add_handler(weather_handler)
+
+    application.add_handler(set_username_handler)
+    application.add_handler(set_location_handler)
+    application.add_handler(set_daily_greeting_handler)
+    application.add_handler(settings_handler)
     
     # Thread zur Überprüfung der Erinnerungen
     threading.Thread(target=lambda: asyncio.run(check_reminders()), daemon=True).start()
