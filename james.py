@@ -13,7 +13,7 @@ logging.basicConfig(
 )
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await context.bot.send_message(chat_id=update.effective_chat.id, text="Hi there, I am James! 👋 How can I help you? \n_Use /help to see all avaliable commands_", parse_mode='Markdown')
+    await context.bot.send_message(chat_id=update.effective_chat.id, text=f"Hi {update.effective_user.first_name}, I am James! 👋 How can I help you? \n_Use /help to see all avaliable commands_", parse_mode='Markdown')
 
 async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
     header_text = "🤝 *Help*\n\nYou can use these commands to interact with me:"

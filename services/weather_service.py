@@ -3,6 +3,7 @@ from services import setting_service
 from telegram import Update
 from telegram.ext import ContextTypes
 from decouple import config
+from datetime import datetime
 
 WEATHER_API_TOKEN = config('WEATHER_API_TOKEN')
 
@@ -54,26 +55,50 @@ async def get_weather(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await context.bot.send_message(chat_id=update.effective_chat.id, text=f"😬 Sorry! There is an internal error. Please try again or contact the admin.")
 
 async def get_weather_from_api(city):
-    url = f'https://api.weatherapi.com/v1/current.json?key={WEATHER_API_TOKEN}&q={city}&aqi=no'
+    url = f'https://api.weatherapi.com/v1/forecast.json?key={WEATHER_API_TOKEN}&q={city}&days=4&aqi=no&alerts=no'
     response = requests.get(url)
-    
+
     if response.status_code == 200:
         data = response.json()
+
         location_name = data['location']['name']
         location_region = data['location']['region']
-        weather_description = data['current']['condition']['text']
-        temperature_celsius = data['current']['temp_c']
-        feelslike_celsius = data['current']['feelslike_c']
-        humidity = data['current']['humidity']
-        wind_kph = data['current']['wind_kph']
+        # Current Weather
+        current_weather_description = data['current']['condition']['text']
+        current_temperature = data['current']['temp_c']
+        current_wind = data['current']['wind_kph']
+        # Today Weather
+        today_weather_description = data['forecast']['forecastday'][0]['day']['condition']['text']
+        today_temperature = data['forecast']['forecastday'][0]['day']['avgtemp_c']
+        today_chanceof_rain = data['forecast']['forecastday'][0]['day']['daily_chance_of_rain']
+        today_wind = data['forecast']['forecastday'][0]['day']['maxwind_kph']
 
-        response_text = f"*Weather (Current)*\n"
+        response_text = f"*Weather*\n"
         response_text += f"_{location_name}, {location_region}_\n\n"
-        response_text += f"{weather_description}\n\n"
-        response_text += f"🌡 {temperature_celsius} °C\n"
-        response_text += f"💆‍♂️ feels like {feelslike_celsius} °C\n"
-        response_text += f"💧 {humidity} %\n"
-        response_text += f"💨 {wind_kph} km/h"
+        response_text += f"*Today*\n"
+        response_text += f"☀️ {today_weather_description} • 🌡 {today_temperature}°C • ☔️ {today_chanceof_rain}% • 💨 {today_wind} km/h\n\n"
+        # response_text += f"☀️ {today_weather_description}\n 🌡 {today_temperature}°C\n ☔️ {today_chanceof_rain}%\n 💨 {today_wind} km/h\n\n"
+        response_text += f"📆 *Forecast*\n"
+
+        i = 0
+        for day in data['forecast']['forecastday']:
+            if i == 0: 
+                i += 1
+                continue
+            else:
+                tmp_date = datetime.strptime(day['date'], '%Y-%m-%d')
+                forecast_date = tmp_date.strftime('%d.%m')
+                
+                response_text += f"_{forecast_date}_: "
+
+                forecast_weather_description = data['forecast']['forecastday'][i]['day']['condition']['text']
+                forecast_temperature = data['forecast']['forecastday'][i]['day']['avgtemp_c']
+                forecast_chanceof_rain = data['forecast']['forecastday'][i]['day']['daily_chance_of_rain']
+                forecast_wind = data['forecast']['forecastday'][i]['day']['maxwind_kph']
+
+                response_text += f"{forecast_weather_description} • {forecast_temperature}°C • {forecast_chanceof_rain}% • {forecast_wind} km/h\n"
+                # response_text += f"☀️ {forecast_weather_description}\n 🌡 {forecast_temperature}°C\n ☔️ {forecast_chanceof_rain}%\n 💨 {forecast_wind} km/h\n\n"
+                i += 1
 
     else:
         response_text = "😬 Sorry! There is an internal error. Please try again or contact the admin."
