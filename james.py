@@ -48,31 +48,34 @@ async def check_reminders():
   
 if __name__ == '__main__':
     application = ApplicationBuilder().token(TELEGRAM_TOKEN).build()
-    bot = application.bot
     
+    # GENERAL
     start_handler = CommandHandler('start', start)
     help_handler = CommandHandler('help', help)
-    reminder_handler = CommandHandler('remind', reminder_service.remind)
-    cancel_handler = CommandHandler('cancel', reminder_service.cancel)
-    list_handler = CommandHandler('list', reminder_service.list_reminders)
-    weather_handler = CommandHandler('weather', functools.partial(weather_service.get_weather, bot=bot))
+    application.add_handler(start_handler)
+    application.add_handler(help_handler)
 
+    # SETTINGS
     set_username_handler = CommandHandler('setusername', setting_service.set_username)
     set_location_handler = CommandHandler('setlocation', setting_service.set_location)
     set_daily_greeting_handler = CommandHandler('setdailygreeting', setting_service.set_daily_greeting)
     settings_handler = CommandHandler('settings', setting_service.get_settings)
-
-    application.add_handler(start_handler)
-    application.add_handler(help_handler)
-    application.add_handler(reminder_handler)
-    application.add_handler(cancel_handler)
-    application.add_handler(list_handler)
-    application.add_handler(weather_handler)
-
     application.add_handler(set_username_handler)
     application.add_handler(set_location_handler)
     application.add_handler(set_daily_greeting_handler)
     application.add_handler(settings_handler)
+
+    # REMINDER
+    reminder_handler = CommandHandler('remind', reminder_service.remind)
+    cancel_handler = CommandHandler('cancel', reminder_service.cancel)
+    list_handler = CommandHandler('list', reminder_service.list_reminders)
+    application.add_handler(reminder_handler)
+    application.add_handler(cancel_handler)
+    application.add_handler(list_handler)
+
+    # WEATHER
+    weather_handler = CommandHandler('weather', functools.partial(weather_service.get_weather))
+    application.add_handler(weather_handler)
     
     # Thread zur Überprüfung der Erinnerungen
     threading.Thread(target=lambda: asyncio.run(check_reminders()), daemon=True).start()

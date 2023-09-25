@@ -5,7 +5,7 @@ from decouple import config
 
 WEATHER_API_TOKEN = config('WEATHER_API_TOKEN')
 
-async def get_weather(update: Update, context: ContextTypes.DEFAULT_TYPE, bot):
+async def get_weather(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # Die Nachricht des Benutzers in der Form "/weather Stadt" aufteilen
     message_text = update.message.text
     parts = message_text.split(' ')
@@ -47,4 +47,4 @@ async def get_weather(update: Update, context: ContextTypes.DEFAULT_TYPE, bot):
     else:
         response_text = "😬 Sorry! There is an internal error. Please try again or contact the admin."
 
-    await bot.send_message(chat_id=update.effective_chat.id, text=response_text, parse_mode='Markdown')
+    await context.bot.send_message(chat_id=update.effective_chat.id, text=response_text, parse_mode='Markdown')
