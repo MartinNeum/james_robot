@@ -48,6 +48,7 @@ async def check_reminders():
   
 if __name__ == '__main__':
     application = ApplicationBuilder().token(TELEGRAM_TOKEN).build()
+    bot = application.bot
     
     # GENERAL
     start_handler = CommandHandler('start', start)
