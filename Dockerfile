@@ -1,14 +1,8 @@
-# Verwenden Sie ein Basisimage, das Git enthält
-FROM ubuntu:20.04
-
-# Installieren Sie Git im Container (wenn es nicht bereits im Basisimage vorhanden ist)
-RUN apt-get update && apt-get install -y git
+# Verwenden Sie ein Python-Image als Basis
+FROM python:3.8
 
 # Legen Sie das Arbeitsverzeichnis im Container fest
 WORKDIR /app
-
-# Klone das Git-Repository in das Arbeitsverzeichnis
-RUN git clone https://github.com/MartinNeum/james_robot.git
 
 # Kopieren Sie die Anforderungen in den Container und installieren Sie sie
 COPY requirements.txt .
