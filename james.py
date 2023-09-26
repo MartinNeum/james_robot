@@ -1,5 +1,5 @@
 import logging, asyncio, threading, time, json, functools
-from services import reminder_service, weather_service, setting_service
+from services import reminder_service, weather_service, setting_service, shopping_service
 from telegram import Update
 from telegram.ext import ApplicationBuilder, ContextTypes, CommandHandler
 from decouple import config
@@ -57,11 +57,9 @@ if __name__ == '__main__':
     application.add_handler(help_handler)
 
     # SETTINGS
-    set_username_handler = CommandHandler('setusername', setting_service.set_username)
     set_location_handler = CommandHandler('setlocation', setting_service.set_location)
     set_daily_greeting_handler = CommandHandler('setdailygreeting', setting_service.set_daily_greeting)
     settings_handler = CommandHandler('settings', setting_service.get_settings)
-    application.add_handler(set_username_handler)
     application.add_handler(set_location_handler)
     application.add_handler(set_daily_greeting_handler)
     application.add_handler(settings_handler)
@@ -73,6 +71,16 @@ if __name__ == '__main__':
     application.add_handler(reminder_handler)
     application.add_handler(cancel_handler)
     application.add_handler(list_handler)
+
+    # SHOPPINGLIST
+    add_items_handler = CommandHandler('add', shopping_service.add_items)
+    remove_items_handler = CommandHandler('remove', shopping_service.remove_items)
+    get_shoppinglist_handler = CommandHandler('shoppinglist', shopping_service.get_shoppinglist)
+    clear_shoppinglist_handler = CommandHandler('clear', shopping_service.clear_shoppinglist)
+    application.add_handler(add_items_handler)
+    application.add_handler(remove_items_handler)
+    application.add_handler(get_shoppinglist_handler)
+    application.add_handler(clear_shoppinglist_handler)
 
     # WEATHER
     weather_handler = CommandHandler('weather', functools.partial(weather_service.get_weather))

@@ -105,7 +105,7 @@ async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
         logging.error(str(e))
 
 async def list_reminders(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    reminders_text = "📃 *List of current Reminders*\n_Timezone is UTC_ \n\n"
+    reminders_text = f"📃 *{update.effective_user.first_name}'s Reminders*\n_Timezone is UTC_ \n\n"
     
     try:
         with open(REMINDERS_LIST, 'r') as file:
