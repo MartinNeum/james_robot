@@ -3,7 +3,7 @@ from services import reminder_service, weather_service, setting_service, shoppin
 from telegram import Update
 from telegram.ext import ApplicationBuilder, ContextTypes, CommandHandler
 from decouple import config
-from datetime import datetime
+from datetime import datetime, timedelta
 
 TELEGRAM_TOKEN = config('TELEGRAM_TOKEN')
 
@@ -26,7 +26,56 @@ async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
         parse_mode='Markdown'
     )
 
-async def check_reminders():
+async def good_morning(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    try:
+        goodmorning = await get_goodmorning_string(update.effective_chat.id, update.effective_user.first_name)
+        await context.bot.send_message(chat_id=update.effective_chat.id, text=goodmorning, parse_mode='Markdown', disable_web_page_preview=True)
+
+    except Exception as e:
+        logging.error(str(e))
+        await context.bot.send_message(chat_id=update.effective_chat.id, text=f"😬 Sorry! There is an internal error. Please try again or contact the admin.", parse_mode='Markdown')
+
+async def get_goodmorning_string(chat_id, username):
+    try:
+        # Weather
+        location = None
+        with open(setting_service.SETTINGS_LIST, 'r') as file:
+            settings = json.load(file)
+
+        setting_exists = False
+        for setting in settings:
+            if setting['chat_id'] == chat_id:
+                setting_exists = True
+                location = setting['location']
+                weather_info = await weather_service.get_weather_from_api(location)
+
+        if not setting_exists:
+            weather_info = "_Weather: No location set. Use /setlocation to get the weather._\n\n"
+
+        # News
+        news_info = await news_service.get_news_from_api()
+
+        # Morning Text
+        today = datetime.now()
+        weekday = today.strftime("%A")
+        day = today.strftime("%d")
+        month = today.strftime("%B")
+
+        goodmorning_message = f"🌅 *Good Morning, {username}!*\n\n"
+        goodmorning_message += f"Today is {weekday}, {month} {day}.\n\n"
+        goodmorning_message += f"---\n"
+        goodmorning_message += f"{weather_info}\n"
+        goodmorning_message += f"---\n"
+        goodmorning_message += f"{news_info}"
+        goodmorning_message += f"Have a great start into the day! 😊\n_James_"
+
+    except Exception as e:
+        logging.error(str(e))
+        await bot.send_message(chat_id=chat_id, text=f"😬 Sorry! There is an internal error. Please try again or contact the admin.", parse_mode='Markdown')
+
+    return goodmorning_message
+
+async def check_reminders_job():
     while True:
         try:
             with open(reminder_service.REMINDERS_LIST, 'r') as file:
@@ -47,45 +96,30 @@ async def check_reminders():
 
         await asyncio.sleep(30)
 
-async def good_morning(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    try:
-        # Weather
-        location = None
-        with open(setting_service.SETTINGS_LIST, 'r') as file:
-            settings = json.load(file)
+async def make_morning_greeting_job():
+    while True:
+        try:
+            now = datetime.now()
+            daily_message_time = datetime(now.year, now.month, now.day, 8, 0, 0)
 
-        setting_exists = False
-        for setting in settings:
-            if setting['chat_id'] == update.effective_chat.id:
-                setting_exists = True
-                location = setting['location']
-                weather_info = await weather_service.get_weather_from_api(location)
+            if now >= daily_message_time:
+                daily_message_time += timedelta(days=1)
 
-        if not setting_exists:
-            weather_info = "_Weather: No location set. Use /setlocation to get the weather._\n\n"
+            wait = daily_message_time - now
+            await asyncio.sleep(wait.total_seconds())
 
-        # News
-        news_info = await news_service.get_news_from_api()
+            # Make Greeting
+            with open(setting_service.SETTINGS_LIST, "r") as file:
+                settings = json.load(file)
 
-        # Morning Text
-        today = datetime.now()
-        weekday = today.strftime("%A")
-        day = today.strftime("%d")
-        month = today.strftime("%B")
-
-        goodmorning = f"🌅 *Good Morning, {update.effective_user.first_name}!*\n\n"
-        goodmorning += f"Today is {weekday}, {month} {day}.\n\n"
-        goodmorning += f"----\n"
-        goodmorning += f"{weather_info}\n"
-        goodmorning += f"----\n"
-        goodmorning += f"{news_info}"
-        goodmorning += f"Have a nice start into the day! 😊\n_James_"
-
-        await context.bot.send_message(chat_id=update.effective_chat.id, text=goodmorning, parse_mode='Markdown', disable_web_page_preview=True)
-
-    except Exception as e:
-        logging.error(str(e))
-        await context.bot.send_message(chat_id=update.effective_chat.id, text=f"😬 Sorry! There is an internal error. Please try again or contact the admin.", parse_mode='Markdown')
+            for setting in settings:
+                if setting['get_daily_greeting']:
+                    morning_text = await get_goodmorning_string(setting['chat_id'], setting['username'])
+                    await bot.send_message(chat_id=setting['chat_id'], text=morning_text, parse_mode='Markdown', disable_web_page_preview=True)
+        
+        except Exception as e:
+            logging.error(str(e))
+            await bot.send_message(chat_id=setting["chat_id"], text=f"😬 Sorry! Something went wrong with the daily update. Please tell the admin - thanks!", parse_mode='Markdown')
   
 if __name__ == '__main__':
     application = ApplicationBuilder().token(TELEGRAM_TOKEN).build()
@@ -132,8 +166,9 @@ if __name__ == '__main__':
     # NEWS
     news_handler = CommandHandler('news', functools.partial(news_service.get_news))
     application.add_handler(news_handler)
-    
+
     # Thread zur Überprüfung der Erinnerungen
-    threading.Thread(target=lambda: asyncio.run(check_reminders()), daemon=True).start()
+    threading.Thread(target=lambda: asyncio.run(check_reminders_job()), daemon=True).start()
+    threading.Thread(target=lambda: asyncio.run(make_morning_greeting_job()), daemon=True).start()
     
     application.run_polling()

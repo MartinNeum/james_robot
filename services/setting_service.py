@@ -41,6 +41,7 @@ async def set_location(update: Update, context: ContextTypes.DEFAULT_TYPE):
             if not setting_exists:
                 new_setting = {
                     "chat_id": update.effective_chat.id,
+                    "username": update.effective_user.first_name,
                     "location": location,
                     "get_daily_greeting": False
                 }
@@ -106,6 +107,7 @@ async def set_daily_greeting(update: Update, context: ContextTypes.DEFAULT_TYPE)
             if not setting_exists:
                 new_setting = {
                     "chat_id": update.effective_chat.id,
+                    "username": update.effective_user.first_name,
                     "location": None,
                     "get_daily_greeting": want_greeting
                 }

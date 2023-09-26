@@ -116,7 +116,7 @@ async def get_shoppinglist(update: Update, context: ContextTypes.DEFAULT_TYPE):
             if list['chat_id'] == update.effective_chat.id:
                 list_exists = True
                 if len(list['items']) == 0:
-                    await context.bot.send_message(chat_id=update.effective_chat.id, text=f"💁‍♂️ Your list is empty - let's make some wishes! 💭🧞‍♀️\n _Use /add to add items_", parse_mode='Markdown')
+                    await context.bot.send_message(chat_id=update.effective_chat.id, text=f"💁‍♂️ Your list is empty - let's make some wishes! 💭🧞‍♀️", parse_mode='Markdown')
                     return
                 for item in list['items']:
                     items_string += f"• {item}\n"
