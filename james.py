@@ -3,6 +3,7 @@ from services import reminder_service, weather_service, setting_service, shoppin
 from telegram import Update
 from telegram.ext import ApplicationBuilder, ContextTypes, CommandHandler
 from decouple import config
+from datetime import datetime
 
 TELEGRAM_TOKEN = config('TELEGRAM_TOKEN')
 
@@ -45,6 +46,46 @@ async def check_reminders():
             logging.error(str(e))
 
         await asyncio.sleep(30)
+
+async def good_morning(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    try:
+        # Weather
+        location = None
+        with open(setting_service.SETTINGS_LIST, 'r') as file:
+            settings = json.load(file)
+
+        setting_exists = False
+        for setting in settings:
+            if setting['chat_id'] == update.effective_chat.id:
+                setting_exists = True
+                location = setting['location']
+                weather_info = await weather_service.get_weather_from_api(location)
+
+        if not setting_exists:
+            weather_info = "_Weather: No location set. Use /setlocation to get the weather._\n\n"
+
+        # News
+        news_info = await news_service.get_news_from_api()
+
+        # Morning Text
+        today = datetime.now()
+        weekday = today.strftime("%A")
+        day = today.strftime("%d")
+        month = today.strftime("%B")
+
+        goodmorning = f"🌅 *Good Morning, {update.effective_user.first_name}!*\n\n"
+        goodmorning += f"Today is {weekday}, {month} {day}.\n\n"
+        goodmorning += f"----\n"
+        goodmorning += f"{weather_info}\n"
+        goodmorning += f"----\n"
+        goodmorning += f"{news_info}"
+        goodmorning += f"Have a nice start into the day! 😊\n_James_"
+
+        await context.bot.send_message(chat_id=update.effective_chat.id, text=goodmorning, parse_mode='Markdown', disable_web_page_preview=True)
+
+    except Exception as e:
+        logging.error(str(e))
+        await context.bot.send_message(chat_id=update.effective_chat.id, text=f"😬 Sorry! There is an internal error. Please try again or contact the admin.", parse_mode='Markdown')
   
 if __name__ == '__main__':
     application = ApplicationBuilder().token(TELEGRAM_TOKEN).build()
@@ -53,8 +94,10 @@ if __name__ == '__main__':
     # GENERAL
     start_handler = CommandHandler('start', start)
     help_handler = CommandHandler('help', help)
+    goodmorning_handler = CommandHandler('goodmorning', good_morning)
     application.add_handler(start_handler)
     application.add_handler(help_handler)
+    application.add_handler(goodmorning_handler)
 
     # SETTINGS
     set_location_handler = CommandHandler('setlocation', setting_service.set_location)

@@ -4,64 +4,6 @@ from telegram.ext import ContextTypes
 
 SETTINGS_LIST = 'settings.json'
 
-# async def set_username(update: Update, context: ContextTypes.DEFAULT_TYPE):
-#     header_text = "⚙️ *How to: /setusername*"
-#     syntax_text = "Please use this format: /setusername `your_username`"
-#     format_text = "• For `your_username` paste your Username"
-#     example_text = "`/setusername Jürgen` \n\nIn this example, James will now call you _'Jürgen'_."
-
-#     try:
-#         args = context.args
-
-#         if len(args) != 1:
-#             await context.bot.send_message(chat_id=update.effective_chat.id, text=f"{header_text}\n\n {syntax_text}\n\n *Parameters*\n {format_text}\n\n *Example*\n {example_text}", parse_mode='Markdown')
-#             return
-
-#         username = args[0]
-#         setting_exists = False
-
-#         # Settings auslesen
-#         try:
-#             with open(SETTINGS_LIST, 'r') as file:
-#                 settings = json.load(file)
-#         except FileNotFoundError:
-#             settings = []
-
-#         try:
-#             # Finde Setting des Chats
-#             for setting in settings:
-#                 if setting["chat_id"] == update.effective_chat.id:
-#                     setting_exists = True
-#                     setting["username"] = username
-
-#                 with open(SETTINGS_LIST, 'w') as file:
-#                     json.dump(settings, file, indent=2)
-
-#             # Wenn kein Setting vorhanden, ein neues erstellen
-#             if not setting_exists:
-#                 new_setting = {
-#                     "chat_id": update.effective_chat.id,
-#                     "username": username,
-#                     "location": None,
-#                     "get_daily_greeting": False
-#                 }
-
-#                 settings.append(new_setting)
-
-#                 with open(SETTINGS_LIST, 'w') as file:
-#                     json.dump(settings, file, indent=2)
-
-#         except Exception as e:
-#             logging.error(str(e))
-#             await context.bot.send_message(chat_id=update.effective_chat.id, text=f"😬 Sorry! There is an internal error. Please try again or contact the admin.")
-
-#         await context.bot.send_message(chat_id=update.effective_chat.id, text=f"Success! ✅ Hi there, {username}! 😊👋", parse_mode='Markdown')
-        
-#     except Exception as e:
-#         logging.error(str(e))
-#         await context.bot.send_message(chat_id=update.effective_chat.id, text=f"😬 Sorry! There is an internal error. Please try again or contact the admin.")
-
-
 async def set_location(update: Update, context: ContextTypes.DEFAULT_TYPE):
     header_text = "⚙️ *How to: /setlocation*"
     syntax_text = "Please use this format: /setlocation `your_location`"
