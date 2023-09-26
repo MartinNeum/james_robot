@@ -11,10 +11,5 @@ RUN pip install -r requirements.txt
 # Kopieren Sie Ihren Bot-Code in den Container
 COPY . .
 
-# JSON Dateien erstellen
-RUN echo '[]' > settings.json
-RUN echo '[]' > reminders.json
-RUN echo '[]' > shoppinglist.json
-
 # Führen Sie den Bot aus, wenn der Container gestartet wird
 CMD ["python", "james.py"]
