@@ -1,0 +1,4 @@
+python-telegram-bot
+python-decouple
+requests
+asyncio
