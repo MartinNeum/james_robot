@@ -4,6 +4,12 @@ FROM python:3.8
 # Legen Sie das Arbeitsverzeichnis im Container fest
 WORKDIR /app
 
+# Kopieren Sie die Python-Datei in das Arbeitsverzeichnis
+COPY reminders.json .
+COPY .env .
+COPY weather.py .
+COPY james.py .
+
 # Kopieren Sie die Anforderungen in den Container und installieren Sie sie
 COPY requirements.txt .
 RUN pip install -r requirements.txt
