@@ -10,7 +10,6 @@ COPY settings.json .
 COPY shoppinglist.json .
 COPY .env .
 
-
 # Kopieren Sie die Anforderungen in den Container und installieren Sie sie
 COPY requirements.txt .
 RUN pip install -r requirements.txt
