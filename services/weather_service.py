@@ -55,7 +55,7 @@ async def get_weather(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await context.bot.send_message(chat_id=update.effective_chat.id, text=f"😬 Sorry! There is an internal error. Please try again or contact the admin.")
 
 async def get_weather_from_api(city):
-    url = f'https://api.weatherapi.com/v1/forecast.json?key={WEATHER_API_TOKEN}&q={city}&days=4&aqi=no&alerts=no'
+    url = f'https://api.weatherapi.com/v1/forecast.json?key={WEATHER_API_TOKEN}&q={city}&days=3&aqi=no&alerts=yes'
     response = requests.get(url)
 
     if response.status_code == 200:
@@ -63,6 +63,12 @@ async def get_weather_from_api(city):
 
         location_name = data['location']['name']
         location_region = data['location']['region']
+        # Check Alerts
+        alert_text = ''
+        for alert in data['alerts']['alert']:
+            alert_text += f'⚠️ *Warning: {alert["headline"]}*\n'
+            alert_text += f'_Category: {alert["category"]}_\n'
+            alert_text += f'_Description: {alert["desc"]}_\n'
         # Current Weather
         current_weather_description = data['current']['condition']['text']
         current_temperature = data['current']['temp_c']
@@ -71,12 +77,11 @@ async def get_weather_from_api(city):
         today_weather_description = data['forecast']['forecastday'][0]['day']['condition']['text']
         today_temperature = data['forecast']['forecastday'][0]['day']['maxtemp_c']
         today_chanceof_rain = data['forecast']['forecastday'][0]['day']['daily_chance_of_rain']
-        today_wind = data['forecast']['forecastday'][0]['day']['maxwind_kph']
 
-        response_text = f"*Weather*\n"
-        response_text += f"_{location_name}, {location_region}_\n\n"
+        response_text = f"*Weather* • _{location_name}_\n\n"
+        response_text += f"{alert_text}\n"
         response_text += f"*Today*\n"
-        response_text += f"☀️ {today_weather_description} • 🌡 {today_temperature}°C • ☔️ {today_chanceof_rain}% • 💨 {today_wind} km/h\n\n"
+        response_text += f"☀️ {today_weather_description} • 🌡 {today_temperature}°C • ☔️ {today_chanceof_rain}%\n\n"
         response_text += f"📆 *Forecast*\n"
 
         i = 0
@@ -93,9 +98,8 @@ async def get_weather_from_api(city):
                 forecast_weather_description = data['forecast']['forecastday'][i]['day']['condition']['text']
                 forecast_temperature = data['forecast']['forecastday'][i]['day']['maxtemp_c']
                 forecast_chanceof_rain = data['forecast']['forecastday'][i]['day']['daily_chance_of_rain']
-                forecast_wind = data['forecast']['forecastday'][i]['day']['maxwind_kph']
 
-                response_text += f"{forecast_weather_description} • {forecast_temperature}°C • {forecast_chanceof_rain}% • {forecast_wind} km/h\n"
+                response_text += f"{forecast_weather_description} • {forecast_temperature}°C • {forecast_chanceof_rain}%\n"
                 i += 1
 
     else:
