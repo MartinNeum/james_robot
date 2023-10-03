@@ -33,7 +33,11 @@ async def set_user_chat_language(update: Update, context):
     await query.answer()
 
     try:
-        await setting_service.create_new_setting(update.effective_chat.id, update.effective_user.first_name, query.data, None, False)
+        user_setting = setting_service.get_setting_by_chat_id(update.effective_chat.id)
+        if user_setting is None:
+            await setting_service.create_new_setting(update.effective_chat.id, update.effective_user.first_name, query.data, None, None, False)
+        else:
+            await context.bot.send_message(chat_id=update.effective_chat.id, text=f"😬 Sorry! There is an internal error. Language setting already exists.", parse_mode='Markdown')
 
     except Exception as e:
         logging.error(str(e))
@@ -66,7 +70,7 @@ async def good_morning(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def get_goodmorning_string(chat_id, username):
     try:
         # Weather
-        location = None
+        city = None
         with open(setting_service.SETTINGS_LIST, 'r') as file:
             settings = json.load(file)
 
@@ -74,11 +78,12 @@ async def get_goodmorning_string(chat_id, username):
         for setting in settings:
             if setting['chat_id'] == chat_id:
                 setting_exists = True
-                location = setting['location']
-                weather_info = await weather_service.get_weather_from_api(location)
+                city = setting['city']
+                lang = setting['language']
+                weather_info = await weather_service.get_weather_from_api(city, lang)
 
         if not setting_exists:
-            weather_info = "_Weather: No location set. Use /setlocation to get the weather._\n\n"
+            weather_info = "_Weather: No city set. Use /setcity to get the weather._\n\n"
 
         # News
         news_info = await news_service.get_news_from_api()
@@ -165,10 +170,12 @@ if __name__ == '__main__':
     application.add_handler(CallbackQueryHandler(set_user_chat_language))
 
     # SETTINGS
-    set_location_handler = CommandHandler('setlocation', setting_service.set_location)
+    set_city_handler = CommandHandler('setcity', setting_service.set_city)
+    set_country_handler = CommandHandler('setcountry', setting_service.set_country)
     set_daily_greeting_handler = CommandHandler('setdailygreeting', setting_service.set_daily_greeting)
     settings_handler = CommandHandler('settings', setting_service.get_settings)
-    application.add_handler(set_location_handler)
+    application.add_handler(set_city_handler)
+    application.add_handler(set_country_handler)
     application.add_handler(set_daily_greeting_handler)
     application.add_handler(settings_handler)
 
