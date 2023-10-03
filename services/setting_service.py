@@ -3,6 +3,7 @@ from telegram import Update
 from telegram.ext import ContextTypes
 
 SETTINGS_LIST = 'settings.json'
+DEFAULT_LANGUAGE = 'en'
 
 async def set_location(update: Update, context: ContextTypes.DEFAULT_TYPE):
     header_text = "⚙️ *How to: /setlocation*"
@@ -37,7 +38,7 @@ async def set_location(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     with open(SETTINGS_LIST, 'w') as file:
                         json.dump(settings, file, indent=2)
 
-            if not setting_exists: await create_new_setting(update.effective_chat.id, update.effective_user.first_name, location, False)
+            if not setting_exists: await create_new_setting(update.effective_chat.id, update.effective_user.first_name, DEFAULT_LANGUAGE, location, False)
 
         except Exception as e:
             logging.error(str(e))
@@ -92,7 +93,7 @@ async def set_daily_greeting(update: Update, context: ContextTypes.DEFAULT_TYPE)
                     with open(SETTINGS_LIST, 'w') as file:
                         json.dump(settings, file, indent=2)
 
-            if not setting_exists: await create_new_setting(update.effective_chat.id, update._effective_user.first_name, None, want_greeting)
+            if not setting_exists: await create_new_setting(update.effective_chat.id, update._effective_user.first_name, DEFAULT_LANGUAGE, None, want_greeting)
 
         except Exception as e:
             logging.error(str(e))
@@ -127,10 +128,10 @@ async def get_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 if setting["chat_id"] == update.effective_chat.id:
                     setting_exists = True
                     get_greeting = "Yes" if setting['get_daily_greeting'] else "No"
-                    settings_text += f"📍 Location: _{setting['location']}_\n 📰 Daily Update: _{get_greeting}_"
+                    settings_text += f"💬 Language: _{setting['language']}_\n 📍 Location: _{setting['location']}_\n 📰 Daily Update: _{get_greeting}_"
 
             if not setting_exists: 
-                new = await create_new_setting(update.effective_chat.id, update.effective_user.first_name, None, False)
+                new = await create_new_setting(update.effective_chat.id, update.effective_user.first_name, DEFAULT_LANGUAGE, None, False)
                 settings_text += f"📍 Location: _{new['location']}_\n 📰 Daily Update: _No_"
             
         except Exception as e:
@@ -144,7 +145,10 @@ async def get_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
         logging.error(str(e))
         await context.bot.send_message(chat_id=update.effective_chat.id, text=f"😬 Sorry! There is an internal error. Please try again or contact the admin.")
 
-async def create_new_setting(chat_id, username, location, get_daily_greeting):
+# 
+# Helper functions
+# 
+async def create_new_setting(chat_id, username, language, location, get_daily_greeting):
     try:
         with open(SETTINGS_LIST, 'r') as file:
             settings = json.load(file)
@@ -154,6 +158,7 @@ async def create_new_setting(chat_id, username, location, get_daily_greeting):
     new_setting = {
         "chat_id": chat_id,
         "username": username,
+        "language": language,
         "location": location,
         "get_daily_greeting": get_daily_greeting
     }

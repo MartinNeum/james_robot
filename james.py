@@ -1,7 +1,7 @@
 import logging, asyncio, threading, time, json, functools
 from services import reminder_service, weather_service, setting_service, news_service
-from telegram import Update
-from telegram.ext import ApplicationBuilder, ContextTypes, CommandHandler
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram.ext import ApplicationBuilder, ContextTypes, Updater, CommandHandler, CallbackQueryHandler
 from decouple import config
 from datetime import datetime, timedelta
 
@@ -16,7 +16,33 @@ logging.basicConfig(
 )
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await context.bot.send_message(chat_id=update.effective_chat.id, text=f"Hi {update.effective_user.first_name}, I am James! 👋 How can I help you? \n_Use /help to see all avaliable commands_", parse_mode='Markdown')
+    message = f'Hi there, I am James! 👋 Please select a language:\n'
+
+    keyboard = [
+        [
+            InlineKeyboardButton("🇬🇧 English", callback_data="en"),
+            InlineKeyboardButton("🇩🇪 Deutsch", callback_data="de"),
+        ]
+    ]
+
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    await context.bot.send_message(chat_id=update.effective_chat.id, text=message, reply_markup=reply_markup, parse_mode='Markdown')
+
+async def set_user_chat_language(update: Update, context):
+    query = update.callback_query
+    await query.answer()
+
+    try:
+        await setting_service.create_new_setting(update.effective_chat.id, update.effective_user.first_name, query.data, None, False)
+
+    except Exception as e:
+        logging.error(str(e))
+        await context.bot.send_message(chat_id=update.effective_chat.id, text=f"😬 Sorry! There is an internal error. Please try again or contact the admin.", parse_mode='Markdown')
+
+    if query.data == "de":
+        await query.edit_message_text(text=f"Willkommen, {update.effective_user.first_name}! 🤗")
+    elif query.data == "en":
+        await query.edit_message_text(text=f"Welcome, {update.effective_user.first_name}! 🤗")
 
 async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
     header_text = "🤝 *Help*\n\nYou can use these commands to interact with me:"
@@ -136,6 +162,7 @@ if __name__ == '__main__':
     application.add_handler(start_handler)
     application.add_handler(help_handler)
     application.add_handler(goodmorning_handler)
+    application.add_handler(CallbackQueryHandler(set_user_chat_language))
 
     # SETTINGS
     set_location_handler = CommandHandler('setlocation', setting_service.set_location)
