@@ -6,6 +6,8 @@ from decouple import config
 from datetime import datetime, timedelta
 
 TELEGRAM_TOKEN = config('TELEGRAM_TOKEN')
+DAILY_GREETING_HOUR = 5
+DAILY_GREETING_MINUTE = 30
 
 logging.basicConfig(
     format='[%(levelname)s] %(asctime)s : %(message)s',
@@ -100,7 +102,7 @@ async def make_morning_greeting_job():
     while True:
         try:
             now = datetime.now()
-            daily_message_time = datetime(now.year, now.month, now.day, 8, 0, 0)
+            daily_message_time = datetime(now.year, now.month, now.day, DAILY_GREETING_HOUR, DAILY_GREETING_MINUTE, 0)
 
             if now >= daily_message_time:
                 daily_message_time += timedelta(days=1)
