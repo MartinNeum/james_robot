@@ -69,7 +69,7 @@ async def get_weather_from_api(city):
         current_wind = data['current']['wind_kph']
         # Today Weather
         today_weather_description = data['forecast']['forecastday'][0]['day']['condition']['text']
-        today_temperature = data['forecast']['forecastday'][0]['day']['avgtemp_c']
+        today_temperature = data['forecast']['forecastday'][0]['day']['maxtemp_c']
         today_chanceof_rain = data['forecast']['forecastday'][0]['day']['daily_chance_of_rain']
         today_wind = data['forecast']['forecastday'][0]['day']['maxwind_kph']
 
@@ -91,7 +91,7 @@ async def get_weather_from_api(city):
                 response_text += f"_{forecast_date}_: "
 
                 forecast_weather_description = data['forecast']['forecastday'][i]['day']['condition']['text']
-                forecast_temperature = data['forecast']['forecastday'][i]['day']['avgtemp_c']
+                forecast_temperature = data['forecast']['forecastday'][i]['day']['maxtemp_c']
                 forecast_chanceof_rain = data['forecast']['forecastday'][i]['day']['daily_chance_of_rain']
                 forecast_wind = data['forecast']['forecastday'][i]['day']['maxwind_kph']
 
