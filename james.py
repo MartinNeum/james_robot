@@ -62,9 +62,11 @@ async def get_goodmorning_string(chat_id, username):
         weekday = today.strftime("%A")
         day = today.strftime("%d")
         month = today.strftime("%B")
+        year = today.strftime("%Y")
 
         goodmorning_message = f"🌅 *Good Morning, {username}!*\n\n"
-        goodmorning_message += f"Today is {weekday}, {month} {day}.\n\n"
+        # goodmorning_message += f"Today is {weekday}, {month} {day}.\n\n"
+        goodmorning_message += f"Today is {weekday}, {day} {month} {year}.\n\n"
         goodmorning_message += f"---\n"
         goodmorning_message += f"{weather_info}\n"
         goodmorning_message += f"---\n"
