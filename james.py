@@ -33,7 +33,7 @@ async def set_user_chat_language(update: Update, context):
     await query.answer()
 
     try:
-        user_setting = setting_service.get_setting_by_chat_id(update.effective_chat.id)
+        user_setting = await setting_service.get_setting_by_chat_id(update.effective_chat.id)
         if user_setting is None:
             await setting_service.create_new_setting(update.effective_chat.id, update.effective_user.first_name, query.data, None, None, False)
         else:
