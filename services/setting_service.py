@@ -100,7 +100,7 @@ async def set_daily_greeting(update: Update, context: ContextTypes.DEFAULT_TYPE)
 
         # Response senden
         if want_greeting:
-            await context.bot.send_message(chat_id=update.effective_chat.id, text=f"Success! ✅ You will now get a daily update form me 🗞", parse_mode='Markdown')
+            await context.bot.send_message(chat_id=update.effective_chat.id, text=f"Success! ✅ You will now get a daily update from me 🗞", parse_mode='Markdown')
         else:
             await context.bot.send_message(chat_id=update.effective_chat.id, text=f"Success! ✅ You won't get any more daily updates.", parse_mode='Markdown')
         
