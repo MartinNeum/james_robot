@@ -1,6 +1,6 @@
 import logging, asyncio, threading, time, json, functools
 from services import reminder_service, weather_service, setting_service, news_service
-from handler import reminder_handler, setting_handler
+from handler import reminder_handler, setting_handler, weather_handler
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ApplicationBuilder, ContextTypes, Updater, CommandHandler, CallbackQueryHandler
 from decouple import config
@@ -172,15 +172,13 @@ if __name__ == '__main__':
 
     setting_command_handler = CommandHandler(['settings', 'set'], setting_handler.handle_request)
     reminder_command_handler = CommandHandler(['reminder'], reminder_handler.handle_request)
+    weather_command_handler = CommandHandler(['weather'], weather_handler.handle_request)
     
     application.add_handlers([
         reminder_command_handler, 
-        setting_command_handler
+        setting_command_handler,
+        weather_command_handler
     ])
-
-    # WEATHER
-    weather_handler = CommandHandler('weather', functools.partial(weather_service.get_weather))
-    application.add_handler(weather_handler)
 
     # NEWS
     news_handler = CommandHandler('news', functools.partial(news_service.get_news))

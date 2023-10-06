@@ -23,3 +23,8 @@ SETTING = {
     "set_daily_true_success": "Success! ✅ You will now get a daily update from me 🗞",
     "set_daily_false_success": "Success! ✅ You won't get any more daily updates.",
 }
+
+WEATHER = {
+    "how_to": f"⚙️ *How To: /weather* \n\nPlease use this format: /weather `your_city` \n\nParameters \n• For `your_city` paste your current city name \n\nExample \n/weather Berlin \n\nIn this example, James will inform you about the weather in Berlin. \n\n_Hint: Use_ `/set city your-city-name`, _so that you don't need to specify your city in future._",
+    "hint": "\n_Hint: Use_ `/set city your-city-name`, _so that you don't need to specify your city in future._"
+}
