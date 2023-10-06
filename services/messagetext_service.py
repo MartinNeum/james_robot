@@ -26,5 +26,6 @@ SETTING = {
 
 WEATHER = {
     "how_to": f"⚙️ *How To: /weather* \n\nPlease use this format: /weather `your_city` \n\nParameters \n• For `your_city` paste your current city name \n\nExample \n/weather Berlin \n\nIn this example, James will inform you about the weather in Berlin. \n\n_Hint: Use_ `/set city your-city-name`, _so that you don't need to specify your city in future._",
-    "hint": "\n_Hint: Use_ `/set city your-city-name`, _so that you don't need to specify your city in future._"
+    "hint": "\n_Hint: Use_ `/set city your-city-name`, _so that you don't need to specify your city in future._",
+    "city_not_found": "🤷‍♂️ Sorry, I couldn't find your city. Please try again.\n"
 }

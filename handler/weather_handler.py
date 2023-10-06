@@ -25,28 +25,32 @@ async def handle_request(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await context.bot.send_message(chat_id=chat_id, text=req_response, parse_mode='Markdown')
 
 async def _prepare_response_text(data):
-    text = f"🌤 *Weather* • _{data['city_name']}_\n\n"
+    if data:
+        text = f"🌤 *Weather* • _{data['city_name']}_\n\n"
 
-    for alert in data['alerts']:
-        text += f"⚠️ *Warning: {alert['headline']}*\n"
-        alert_desc = alert['desc'].replace('\n', " ")
-        text += f"Category: {alert['category']}  •  Description: {alert_desc}\n\n"
+        for alert in data['alerts']:
+            text += f"⚠️ *Warning: {alert['headline']}*\n"
+            alert_desc = alert['desc'].replace('\n', " ")
+            text += f"Category: {alert['category']}  •  Description: {alert_desc}\n\n"
 
-    i=0
-    for day in data['data']:
-        desc = day['day']['condition']['text']
-        temp = day['day']['maxtemp_c']
-        chance_rain = day['day']['daily_chance_of_rain']
-        if i == 0: text += f"Today \n"
-        elif i == 1: text += f"Forecast \n"
-        if i > 0:
-            tmp_date = datetime.strptime(day['date'], '%Y-%m-%d')
-            forecast_date = tmp_date.strftime('%d.%m')
-            text += f"{forecast_date}: "
-        
-        text += f"{desc} • 🌡 {temp} °C • ☔️ {chance_rain} %\n"
-        if i == 0: text += f"\n"
+        i=0
+        for day in data['data']:
+            desc = day['day']['condition']['text']
+            temp = day['day']['maxtemp_c']
+            chance_rain = day['day']['daily_chance_of_rain']
+            if i == 0: text += f"Today \n"
+            elif i == 1: text += f"Forecast \n"
+            if i > 0:
+                tmp_date = datetime.strptime(day['date'], '%Y-%m-%d')
+                forecast_date = tmp_date.strftime('%d.%m')
+                text += f"{forecast_date}: "
+            
+            text += f"{desc} • 🌡 {temp} °C • ☔️ {chance_rain} %\n"
+            if i == 0: text += f"\n"
 
-        i += 1
+            i += 1
 
-    return text
+        return text
+    
+    else:
+        return messagetext_service.WEATHER['city_not_found']
