@@ -1,6 +1,6 @@
 import logging, asyncio, threading, time, json, functools
 from services import reminder_service, weather_service, setting_service, news_service
-from handler import reminder_handler, setting_handler, weather_handler
+from handler import reminder_handler, setting_handler, weather_handler, news_handler
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ApplicationBuilder, ContextTypes, Updater, CommandHandler, CallbackQueryHandler
 from decouple import config
@@ -17,37 +17,8 @@ logging.basicConfig(
 )
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    message = f'Hi there, I am James! 👋 Please select a language:\n'
-
-    keyboard = [
-        [
-            InlineKeyboardButton("🇬🇧 English", callback_data="en"),
-            InlineKeyboardButton("🇩🇪 Deutsch", callback_data="de"),
-        ]
-    ]
-
-    reply_markup = InlineKeyboardMarkup(keyboard)
-    await context.bot.send_message(chat_id=update.effective_chat.id, text=message, reply_markup=reply_markup, parse_mode='Markdown')
-
-async def set_user_chat_language(update: Update, context):
-    query = update.callback_query
-    await query.answer()
-
-    try:
-        user_setting = await setting_service.get_setting_by_chat_id(update.effective_chat.id)
-        if user_setting is None:
-            await setting_service._create_new_setting(update.effective_chat.id, update.effective_user.first_name, query.data, None, None, False)
-        else:
-            await context.bot.send_message(chat_id=update.effective_chat.id, text=f"😬 Sorry! There is an internal error. Language setting already exists.", parse_mode='Markdown')
-
-    except Exception as e:
-        logging.error(str(e))
-        await context.bot.send_message(chat_id=update.effective_chat.id, text=f"😬 Sorry! There is an internal error. Please try again or contact the admin.", parse_mode='Markdown')
-
-    if query.data == "de":
-        await query.edit_message_text(text=f"Willkommen, {update.effective_user.first_name}! 🤗")
-    elif query.data == "en":
-        await query.edit_message_text(text=f"Welcome, {update.effective_user.first_name}! 🤗")
+    message = f'Hi {update.effective_user.first_name}, I am James! 👋 How can I help you? \n_Hint: Use /help to see all avaliable commands_'
+    await context.bot.send_message(chat_id=update.effective_chat.id, text=message, parse_mode='Markdown')
 
 async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
     header_text = "🤝 *Help*\n\nYou can use these commands to interact with me:"
@@ -87,7 +58,7 @@ async def get_goodmorning_string(chat_id, username):
             weather_info = "_Weather: No city set. Use /setcity to get the weather._\n\n"
 
         # News
-        news_info = await news_service.get_news_from_api()
+        news_info = await news_service.get_news()
 
         # Morning Text
         today = datetime.now()
@@ -168,21 +139,18 @@ if __name__ == '__main__':
     application.add_handler(start_handler)
     application.add_handler(help_handler)
     application.add_handler(goodmorning_handler)
-    application.add_handler(CallbackQueryHandler(set_user_chat_language))
 
     setting_command_handler = CommandHandler(['settings', 'set'], setting_handler.handle_request)
     reminder_command_handler = CommandHandler(['reminder'], reminder_handler.handle_request)
     weather_command_handler = CommandHandler(['weather'], weather_handler.handle_request)
+    news_command_handler = CommandHandler(['news'], news_handler.handle_request)
     
     application.add_handlers([
         reminder_command_handler, 
         setting_command_handler,
-        weather_command_handler
+        weather_command_handler,
+        news_command_handler
     ])
-
-    # NEWS
-    news_handler = CommandHandler('news', functools.partial(news_service.get_news))
-    application.add_handler(news_handler)
 
     # Thread zur Überprüfung der Erinnerungen
     threading.Thread(target=lambda: asyncio.run(check_reminders_job()), daemon=True).start()
