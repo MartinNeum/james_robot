@@ -1,5 +1,6 @@
 import logging, asyncio, threading, time, json, functools
 from services import reminder_service, weather_service, setting_service, news_service
+from handler import reminder_handler
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ApplicationBuilder, ContextTypes, Updater, CommandHandler, CallbackQueryHandler
 from decouple import config
@@ -51,9 +52,9 @@ async def set_user_chat_language(update: Update, context):
 async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
     header_text = "🤝 *Help*\n\nYou can use these commands to interact with me:"
     commands_text = "/help - Show avaliable commands\n /weather - Get the weather of a specified city\n /list - Show current reminders\n /remind - Create reminder\n /cancel - Cancel an existing reminder"
-    
+
     await context.bot.send_message(
-        chat_id=update.effective_chat.id, 
+        chat_id=update.effective_chat.id,
         text=f"{header_text} \n\n {commands_text}",
         parse_mode='Markdown'
     )
@@ -115,19 +116,19 @@ async def check_reminders_job():
         try:
             with open(reminder_service.REMINDERS_LIST, 'r') as file:
                 reminders = json.load(file)
-            
+
             current_time = int(time.time())
-            
+
             for reminder in reminders:
                 if reminder["reminder_time"] <= current_time:
                     await bot.send_message(chat_id=reminder["chat_id"], text=f"🔔 *Reminder:* {reminder['reminder_text']}", parse_mode='Markdown')
                     reminders.remove(reminder)
-            
+
             with open(reminder_service.REMINDERS_LIST, 'w') as file:
                 json.dump(reminders, file, indent=2)
-        
+
         except Exception as e:
-            logging.error(str(e))
+            logging.error(f"Error @ check_reminders_job: {str(e)}")
 
         await asyncio.sleep(30)
 
@@ -151,15 +152,15 @@ async def make_morning_greeting_job():
                 if setting['get_daily_greeting']:
                     morning_text = await get_goodmorning_string(setting['chat_id'], setting['username'])
                     await bot.send_message(chat_id=setting['chat_id'], text=morning_text, parse_mode='Markdown', disable_web_page_preview=True)
-        
+
         except Exception as e:
             logging.error(str(e))
             await bot.send_message(chat_id=setting["chat_id"], text=f"😬 Sorry! Something went wrong with the daily update. Please tell the admin - thanks!", parse_mode='Markdown')
-  
+
 if __name__ == '__main__':
     application = ApplicationBuilder().token(TELEGRAM_TOKEN).build()
     bot = application.bot
-    
+
     # GENERAL
     start_handler = CommandHandler('start', start)
     help_handler = CommandHandler('help', help)
@@ -180,12 +181,8 @@ if __name__ == '__main__':
     application.add_handler(settings_handler)
 
     # REMINDER
-    reminder_handler = CommandHandler('remind', reminder_service.remind)
-    cancel_handler = CommandHandler('cancel', reminder_service.cancel)
-    list_handler = CommandHandler('list', reminder_service.list_reminders)
-    application.add_handler(reminder_handler)
-    application.add_handler(cancel_handler)
-    application.add_handler(list_handler)
+    reminder_command_handler = CommandHandler(['reminder'], reminder_handler.handle_request)
+    application.add_handlers([reminder_command_handler])
 
     # WEATHER
     weather_handler = CommandHandler('weather', functools.partial(weather_service.get_weather))
@@ -198,5 +195,5 @@ if __name__ == '__main__':
     # Thread zur Überprüfung der Erinnerungen
     threading.Thread(target=lambda: asyncio.run(check_reminders_job()), daemon=True).start()
     threading.Thread(target=lambda: asyncio.run(make_morning_greeting_job()), daemon=True).start()
-    
+
     application.run_polling()
