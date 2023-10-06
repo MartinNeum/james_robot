@@ -1,4 +1,4 @@
-import time, json, logging
+import json, time, logging, asyncio
 from services import messagetext_service
 from datetime import datetime
 
@@ -100,3 +100,23 @@ async def _update_reminders_list(new_reminders_list):
             json.dump(new_reminders_list, file, indent=2)
     except Exception as e:
         logging.error(str(e))
+
+####################
+# Jobs             #
+####################
+async def _do_reminders_job(bot):
+    while True:
+        try:
+            reminders = await _get_all_reminders()
+            current_time = int(time.time())
+
+            for reminder in reminders:
+                if reminder["reminder_time"] <= current_time:
+                    await bot.send_message(chat_id=reminder["chat_id"], text=f"🔔 *Reminder:* {reminder['reminder_text']}", parse_mode='Markdown')
+                    reminders.remove(reminder)
+                    await _update_reminders_list(reminders)
+
+        except Exception as e:
+            logging.error(f"Error @ check_reminders_job: {str(e)}")
+
+        await asyncio.sleep(30)

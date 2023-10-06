@@ -82,27 +82,6 @@ async def get_goodmorning_string(chat_id, username):
 
     return goodmorning_message
 
-async def check_reminders_job():
-    while True:
-        try:
-            with open(reminder_service.REMINDERS_LIST, 'r') as file:
-                reminders = json.load(file)
-
-            current_time = int(time.time())
-
-            for reminder in reminders:
-                if reminder["reminder_time"] <= current_time:
-                    await bot.send_message(chat_id=reminder["chat_id"], text=f"🔔 *Reminder:* {reminder['reminder_text']}", parse_mode='Markdown')
-                    reminders.remove(reminder)
-
-            with open(reminder_service.REMINDERS_LIST, 'w') as file:
-                json.dump(reminders, file, indent=2)
-
-        except Exception as e:
-            logging.error(f"Error @ check_reminders_job: {str(e)}")
-
-        await asyncio.sleep(30)
-
 async def make_morning_greeting_job():
     while True:
         try:
@@ -152,8 +131,8 @@ if __name__ == '__main__':
         news_command_handler
     ])
 
-    # Thread zur Überprüfung der Erinnerungen
-    threading.Thread(target=lambda: asyncio.run(check_reminders_job()), daemon=True).start()
+    # Jobs
+    threading.Thread(target=lambda: asyncio.run(reminder_service._do_reminders_job(bot)), daemon=True).start()
     threading.Thread(target=lambda: asyncio.run(make_morning_greeting_job()), daemon=True).start()
 
     application.run_polling()
