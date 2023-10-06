@@ -1,6 +1,6 @@
 import logging, asyncio, threading, time, json, functools
 from services import reminder_service, weather_service, setting_service, news_service
-from handler import reminder_handler
+from handler import reminder_handler, setting_handler
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ApplicationBuilder, ContextTypes, Updater, CommandHandler, CallbackQueryHandler
 from decouple import config
@@ -36,7 +36,7 @@ async def set_user_chat_language(update: Update, context):
     try:
         user_setting = await setting_service.get_setting_by_chat_id(update.effective_chat.id)
         if user_setting is None:
-            await setting_service.create_new_setting(update.effective_chat.id, update.effective_user.first_name, query.data, None, None, False)
+            await setting_service._create_new_setting(update.effective_chat.id, update.effective_user.first_name, query.data, None, None, False)
         else:
             await context.bot.send_message(chat_id=update.effective_chat.id, text=f"😬 Sorry! There is an internal error. Language setting already exists.", parse_mode='Markdown')
 
@@ -170,19 +170,13 @@ if __name__ == '__main__':
     application.add_handler(goodmorning_handler)
     application.add_handler(CallbackQueryHandler(set_user_chat_language))
 
-    # SETTINGS
-    set_city_handler = CommandHandler('setcity', setting_service.set_city)
-    set_country_handler = CommandHandler('setcountry', setting_service.set_country)
-    set_daily_greeting_handler = CommandHandler('setdailygreeting', setting_service.set_daily_greeting)
-    settings_handler = CommandHandler('settings', setting_service.get_settings)
-    application.add_handler(set_city_handler)
-    application.add_handler(set_country_handler)
-    application.add_handler(set_daily_greeting_handler)
-    application.add_handler(settings_handler)
-
-    # REMINDER
+    setting_command_handler = CommandHandler(['settings', 'set'], setting_handler.handle_request)
     reminder_command_handler = CommandHandler(['reminder'], reminder_handler.handle_request)
-    application.add_handlers([reminder_command_handler])
+    
+    application.add_handlers([
+        reminder_command_handler, 
+        setting_command_handler
+    ])
 
     # WEATHER
     weather_handler = CommandHandler('weather', functools.partial(weather_service.get_weather))

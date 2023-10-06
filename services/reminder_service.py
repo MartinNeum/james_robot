@@ -75,9 +75,9 @@ async def list_reminders(chat_id):
         return messagetext_service.REMINDER['empty_reminder_list']
 
 
-#                    #
-#  HELPER FUNCTIONS  #
-#                    #
+####################
+# Helper functions #
+####################
 async def _save_reminder(new_reminder):
     try:
         reminders = await _get_all_reminders()

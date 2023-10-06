@@ -13,3 +13,13 @@ REMINDER = {
     "success_new_reminder": "Success! ✅ Reminder set with ID:",
     "success_reminder_removed": "Success! ✅ Reminder removed."
 }
+
+SETTING = {
+    "how_to": "⚙️ *How To: /set* \n\nOptions \n• city: /set city your-city \n• dailyupdate: /set dailyupdate yes/no",
+    "how_to_city": "⚙️ *How To: /set city* \n\nPlease use this format: /set city `your_city` \n\nParameters \n• For `your_city` paste your current city name \n\nExample \n/set city Berlin \n\nIn this example, James will use Berlin as your current city.",
+    "how_to_dailyupdate": "⚙️ *How To: /set dailyupdate* \n\nPlease use this format: /set dailyupdate `yes`/`no` \n\nParameters \n• Choose between yes/no, regarding if you wish James to send you an update every morning with weather and news informations \n\nExample \n/set dailyupdate yes \n\nIn this example, James will send you some useful informations every morning.",
+    "set_city_success": "Success! ✅",
+    "set_country_success": "Success! ✅",
+    "set_daily_true_success": "Success! ✅ You will now get a daily update from me 🗞",
+    "set_daily_false_success": "Success! ✅ You won't get any more daily updates.",
+}
