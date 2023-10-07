@@ -1,6 +1,6 @@
 GENERAL = {
     "error": "😬 Sorry! There is an internal error. Please try again or contact the admin.",
-    "help": "🤝 *Help*\n\nYou can use these commands to interact with me: \n\n/help - Show avaliable commands\n /weather - Get the weather of a specified city\n /list - Show current reminders\n /remind - Create reminder\n /cancel - Cancel an existing reminder"
+    "help": "🙋‍♂️ *Help*\n\nYou can use these commands to interact with me: \n\n*General* \n/help - Show avaliable commands \n/goodmorning - Get good-morning-message \n\n*Settings* \n/settings - Show your settings \n/set city your-city - Set your city \n/set dailyupdate yes/no - Let me know if you want a daily update \n\n*Reminder* \n/reminder set time text - Set a reminder \n/reminder cancel reminder-ID - Cancel a reminder \n/reminder list - Get a list of all reminders \n\n*Weather* \n/weather - If you have set your city, get the weather \n/weather city - Get the weather of a specified city \n\n*News* \n/news - Get some headlines"
 }
 
 REMINDER = {

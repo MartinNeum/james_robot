@@ -12,7 +12,7 @@ async def handle_request(update: Update, context: ContextTypes.DEFAULT_TYPE):
     incomming_endpoint = update.message.text.split()[0]
 
     if incomming_endpoint == '/start':
-        req_response = f"Hi {update.effective_user.first_name}, I am James! 👋 How can I help you? \n_Hint: Use /help to see all avaliable commands_"
+        req_response = f"Hi {update.effective_user.first_name}, I am James! 👋 How can I help you? \n_Use /help to see all avaliable commands_"
 
     elif incomming_endpoint == '/help':
         req_response = messagetext_service.GENERAL['help']
