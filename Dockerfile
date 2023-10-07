@@ -17,4 +17,4 @@ RUN pip install -r requirements.txt
 COPY . .
 
 # Führen Sie den Bot aus, wenn der Container gestartet wird
-CMD ["python", "james.py"]
+CMD ["python", "main.py"]
