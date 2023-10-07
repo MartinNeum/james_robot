@@ -5,8 +5,8 @@ from telegram import Update
 from telegram.ext import ContextTypes
 from datetime import datetime, timedelta
 
-DAILY_GREETING_HOUR = 21
-DAILY_GREETING_MINUTE = 31
+DAILY_GREETING_HOUR = 5
+DAILY_GREETING_MINUTE = 30
 
 async def handle_request(update: Update, context: ContextTypes.DEFAULT_TYPE):
     incomming_endpoint = update.message.text.split()[0]
