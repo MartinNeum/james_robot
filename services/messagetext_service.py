@@ -1,5 +1,6 @@
 GENERAL = {
     "error": "😬 Sorry! There is an internal error. Please try again or contact the admin.",
+    "help": "🤝 *Help*\n\nYou can use these commands to interact with me: \n\n/help - Show avaliable commands\n /weather - Get the weather of a specified city\n /list - Show current reminders\n /remind - Create reminder\n /cancel - Cancel an existing reminder"
 }
 
 REMINDER = {
