@@ -7,3 +7,5 @@ A friendly Telegram Bot helping with your daily business. For using this bot, ju
 * Get some news headlines
 * Get a daily good-morning-message with some useful informations
 * Check out your Settings
+
+Check out the ![Wiki](https://github.com/MartinNeum/james_robot/wiki) for more informations.
